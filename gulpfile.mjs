@@ -158,7 +158,7 @@ function html() {
       .pipe(
         fileinclude({
           prefix: "@@",
-          basepath: "app/_html-partials",
+          basepath: "app/html-partials",
         })
       )
 
@@ -178,7 +178,7 @@ function html() {
           } else {
             // repeating "../" based on the arcticture level of the file to replace with ($$) sign
             var route = "../".repeat(
-              (file.path.split("app\/").pop().match(/\//g) || []).length
+              (file.path.split("app/").pop().match(/\//g) || []).length
             );
 
             // getting file name to preview it into tab <title> tag.
