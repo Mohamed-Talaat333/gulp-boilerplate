@@ -46,7 +46,7 @@ function setProdEnv(done) {
 var paths = {
   // images paths
   images: {
-    src: "app/**/*.{jpeg,jpg,png,gif,webp}",
+    src: "app/**/*.{ico,jpeg,jpg,png,gif,webp}",
   },
 
   // font files paths

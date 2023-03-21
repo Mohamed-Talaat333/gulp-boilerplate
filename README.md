@@ -59,8 +59,8 @@
 
 # to do next time
 
-- adding fonts features
-- build a small project for demo. => checked
+- searching/adding fonts features
+- build a small project for demo. => done
 - add multiple level structure to demonstrate the html feature.
 - explain purge-css
 - 
