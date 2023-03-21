@@ -8,10 +8,10 @@
 ## global features
 
 - easy/simple to use, configure and maintain.
-- easy src and execlude certain files or folders from the pipe proccess.
+- easy sourc and execlude certain files or folders from the pipe proccess.
 - watch for any file change, save, move, rename or delete.
-- **instant reload on any file change**, and allows access from external devices **(mobiles/tablets)**, using [browser-sync](https://www.npmjs.com/package/browser-sync).
-- logging errors in (console/terminal/cmd) to make it easy to fix.
+- **instant reload on any file change**, and generate access for external devices **(mobiles/tablets/other PCs)**, using [browser-sync](https://www.npmjs.com/package/browser-sync).
+- logging errors in (console/terminal/cmd) making it easy to fix.
 - works on all operating systems like (windows, macOS, linux).
 - providing two environments, **dev_env** for development and **prod_env** to be the final optimized and minified version.
 - step by step installation guide that will help you get started quickly and also(if you want) learn about gulp in the way.
@@ -36,7 +36,9 @@
 - compiling **SASS**.
 - auto-prefixing for a predefined browser list.
 - source maps only on **dev_env**.
-- minify and optimize css files.
+- remove source maps, minify and optimize css files.
+- purge-css => remove unused styles from any internal or external style files.
+- generate both beautified and minified versions of css on production,
 
 ## javascript features
 
@@ -58,5 +60,7 @@
 # to do next time
 
 - adding fonts features
-- build a small project for demo.
+- build a small project for demo. => checked
 - add multiple level structure to demonstrate the html feature.
+- explain purge-css
+- 
