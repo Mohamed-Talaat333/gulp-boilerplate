@@ -35,8 +35,8 @@
 
 - compiling **SASS**.
 - auto-prefixing for a predefined browser list.
-- source maps only on **dev_env**.
-- remove source maps, minify and optimize css files.
+- source maps only on **dev_env**, then remove it on **prod_env**.
+- minify and optimize css files.
 - purge-css => remove unused styles from any internal or external style files.
 - generate both beautified and minified versions of css on production,
 
@@ -63,3 +63,4 @@
 - add multiple level structure to demonstrate the html feature. => done > folder pages
 - explain purge-css
 - searching/adding fonts features 
+
