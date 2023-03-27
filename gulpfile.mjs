@@ -1,44 +1,41 @@
 import gulp from "gulp";
-const {
-  src,
-  dest,
-  task,
-  watch,
-  series,
-  // parrallel
-} = gulp;
+const { src, dest, task, watch, series, parallel } = gulp;
 
-import browserSync from "browser-sync";
-import minifyJs from "gulp-minify";
-import dartSass from "sass";
-import gulpSass from "gulp-sass";
-const sass = gulpSass(dartSass);
-import sourceMaps from "gulp-sourcemaps";
-import cleanCSS from "gulp-clean-css";
-import autoPrefixer from "gulp-autoprefixer";
-import plumber from "gulp-plumber";
-import fileinclude from "gulp-file-include";
-import remove from "del";
-import gulpIf from "gulp-if";
-import flatMap from "gulp-flatmap";
-import replace from "gulp-replace";
-// import purgeCss from "gulp-purgecss";
+import browserSync from "browser-sync"; // live server
+import minifyJs from "gulp-minify"; // for javascript files minification
+import dartSass from "sass"; // for sass compilation
+import gulpSass from "gulp-sass"; // for sass compilation
+const sass = gulpSass(dartSass); // for sass compilation
+import sourceMaps from "gulp-sourcemaps"; // for css files sourcemaps after sass compilation
+import cleanCSS from "gulp-clean-css"; // for css files minification
+import autoPrefixer from "gulp-autoprefixer"; // for css auto prefixing
+import purgeCss from "gulp-purgecss"; // remove unused styles from any internal or external css files
+import plumber from "gulp-plumber"; // prevent pipe breaking caused by errors from gulp plugins
+import fileinclude from "gulp-file-include"; // for including html files
+import remove from "del"; // for file deletion
+import gulpIf from "gulp-if"; // control the pipe flow with if statement
+import flatMap from "gulp-flatmap"; // map each file in a stream into multiple files that are piped out
+import replace from "gulp-replace"; // replace certain text
 // import imageOpti from "gulp-image";
-import webp from "gulp-webp";
-// import rename from "gulp-rename";
-// import concat from "gulp-concat";
+import webp from "gulp-webp"; // convert images extensions to ".webp"
+import rename from "gulp-rename"; // for files renaming
+import cache from "gulp-cached"; // for caching files in stream
+// import concat from "gulp-concat"; // for files concating
 
 /*******************************************
     Settings
 *******************************************/
 
 var outputDir = "dist"; // folder where all files and folders go after compiling
-var isProd = false;
-var imageExtensions = ['.jpeg"', '.jpg"', '.png"', '.gif"'];
+var isProd = false; // setting production env to false
+var imageExtensions = [".jpeg", ".jpg", ".png", ".gif"];
 
+// or
+
+// run when gulp-prod
 function setProdEnv(done) {
   outputDir = "prod";
-  isProd = true;
+  isProd = true; // setting production env to true
   done();
 }
 
@@ -57,13 +54,18 @@ var paths = {
   // html file paths
   html: {
     src: "app/**/*.html",
-    execlud: ["app/_html-partials{,/**}"],
+    execlud: ["app/html-partials{,/**}"],
   },
 
   // sass or css file paths
   styles: {
     src: "app/**/*.{scss,css}",
-    execlud: ["app/assets/styles/sass{,/**}"],
+    execlud: ["app/assets/styles/sass{,/**}", "app/assets/styles/vendors/**/*"],
+  },
+
+  vendorStyles: {
+    src: "app/**/*.{scss,css}",
+    execlud: ["app/assets/styles/sass{,/**}", "app/assets/styles/style{.css,.scss}"],
   },
 
   // js files paths
@@ -105,9 +107,11 @@ function images() {
       //prevent pipe breaking caused by errors from gulp plugins
       .pipe(plumber())
 
-      // converting to '.webp' to lower the size with almost same quality
+      // optimizing images
       // .pipe(gulpIf(isProd, imageOpti()))
-      // .pipe(gulpIf(isProd, webp()))
+
+      // converting to '.webp' to lower the size with almost same quality
+      .pipe(gulpIf(isProd, webp()))
 
       // destination for the output
       .pipe(dest(outputDir))
@@ -151,14 +155,17 @@ function html() {
         return "!" + item;
       }),
     ])
-      //prevent pipe breaking caused by errors from gulp plugins
+      // prevent pipe breaking caused by errors from gulp plugins
       .pipe(plumber())
 
-      // Including all HTML includes
+      // handling all HTML includes
       .pipe(
         fileinclude({
           prefix: "@@",
           basepath: "app/html-partials",
+          context: {
+            isProd: isProd,
+          },
         })
       )
 
@@ -195,10 +202,10 @@ function html() {
       )
 
       // replacing all images extensions to be '.webp'
-      // .pipe(gulpIf(isProd, replace('.jpg"', '.webp"')))
-      // .pipe(gulpIf(isProd, replace('.jpeg"', '.webp"')))
-      // .pipe(gulpIf(isProd, replace('.png"', '.webp"')))
-      // .pipe(gulpIf(isProd, replace('.gif"', '.webp"')))
+      .pipe(gulpIf(isProd, replace(".jpg", ".webp")))
+      .pipe(gulpIf(isProd, replace(".jpeg", ".webp")))
+      .pipe(gulpIf(isProd, replace(".png", ".webp")))
+      .pipe(gulpIf(isProd, replace(".gif", ".webp")))
 
       // Destination for the output
       .pipe(dest(outputDir))
@@ -214,23 +221,25 @@ function html() {
 
 /* handling style(sass) files
  *******************************************/
-function styles() {
+function styles(passedPaths) {
   // the initializer / master SCSS file, which will just be a file that imports everything
   return (
     src([
-      paths.styles.src,
-      ...paths.styles.execlud.map(function (item) {
+      passedPaths.src,
+      ...passedPaths.execlud.map(function (item) {
         return "!" + item;
       }),
     ])
+      // caching styles files
+      // .pipe(cache("styles"))
+
       // prevent pipe breaking caused by errors from gulp plugins
-      // .pipe(plumber())
+      .pipe(plumber())
 
       // Getting sourceMaps ready only if in development environment
       .pipe(gulpIf(!isProd, sourceMaps.init()))
 
       // Compiling SCSS files
-      // .pipe(sass().on("error", sass.logError))
       .pipe(sass())
 
       // Prefixing all styles to match cross browsers
@@ -243,30 +252,36 @@ function styles() {
       // writing our sourceMaps only if in development environment
       .pipe(gulpIf(!isProd, sourceMaps.write("/")))
 
+      // destination for the not minified output
+      .pipe(dest(outputDir))
+
       // the final filename of our combined css file
       // .pipe(concat("style.css"))
 
       // removing unused css
-      // .pipe(
-      //   gulpIf(
-      //     isProd,
-      //     purgeCss({
-      //       content: [paths.html.src],
-      //     })
-      //   )
-      // )
+      .pipe(
+        gulpIf(
+          isProd,
+          purgeCss({
+            content: [paths.html.src],
+          })
+        )
+      )
 
-      // // replacing all images extensions to be '.webp'
-      // .pipe(gulpIf(isProd, replace('.jpg"', '.webp"')))
-      // .pipe(gulpIf(isProd, replace('.jpeg"', '.webp"')))
-      // .pipe(gulpIf(isProd, replace('.png"', '.webp"')))
-      // .pipe(gulpIf(isProd, replace('.gif"', '.webp"')))
+      // replacing all images extensions to be '.webp'
+      .pipe(gulpIf(isProd, replace(".jpg", ".webp")))
+      .pipe(gulpIf(isProd, replace(".jpeg", ".webp")))
+      .pipe(gulpIf(isProd, replace(".png", ".webp")))
+      .pipe(gulpIf(isProd, replace(".gif", ".webp")))
 
       // minifying our css file/s only if in production environment
       .pipe(gulpIf(isProd, cleanCSS()))
 
-      // destination for the output
-      .pipe(dest(outputDir))
+      // renaming by adding -min
+      .pipe(gulpIf(isProd, rename({ suffix: "-min" })))
+
+      // destination for the minified output
+      .pipe(gulpIf(isProd, dest(outputDir)))
 
       // reloading broswer(browser-sync) after any chage only if in development environment
       .pipe(
@@ -275,6 +290,16 @@ function styles() {
         })
       )
   );
+}
+
+function styles1(done) {
+  styles(paths.styles);
+  done();
+}
+
+function styles2(done) {
+  styles(paths.vendorStyles);
+  done();
 }
 
 /* handling javascript files
@@ -289,7 +314,7 @@ function scripts() {
       }),
     ])
       // prevent pipe breaking caused by errors from gulp plugins
-      // .pipe(plumber())
+      .pipe(plumber())
 
       // this is the filename of the compressed version of our js
       // .pipe(concat("app.js"))
@@ -329,7 +354,8 @@ function watch_files() {
   watch(paths.images.src, images);
   watch(paths.fonts.src, fonts);
   watch(paths.html.src, html);
-  watch(paths.styles.src, styles);
+  watch(paths.styles.src, styles1);
+  watch(paths.vendorStyles.src, styles2);
   watch(paths.scripts.src, scripts);
 
   // handling (deleted && renamed) files or folders while watching/running
@@ -357,7 +383,16 @@ function watch_files() {
 
 task(
   "default",
-  series(removeOldFolders, images, fonts, html, styles, scripts, watch_files)
+  series(
+    removeOldFolders,
+    images,
+    fonts,
+    html,
+    styles1,
+    styles2,
+    scripts,
+    watch_files
+  )
 );
 
 task(
