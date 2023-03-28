@@ -238,7 +238,7 @@ function images() {
 
   - ```in some casses the html-code appended by an internal or external js plugin doesn't get counted for when style-purging and it removes it's styles.```
 
-  - ```in order for this purgecss package to work fine, you should copy the html-code that gets rendered in the browser and add it to an html page to get considered by gulp-purgecss.```
+  - ```in order for this purgecss package to work fine, you should copy the html-code that gets rendered in the browser and add it to an html page to get considered by gulp-purgecss, see (purge-css-components.html)=>(owl-carousel-component).```
 
 - then we minify css files and add suffix ```-min```
 
