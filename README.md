@@ -57,15 +57,15 @@
 
 # getting started => installation
 
-- first clone this repo
+- first clone this repo.
 - install Node.js 16.16.0 or higher =>
-- [download](https://nodejs.org/en/)
-- or [use-nvm](https://dev.to/skaytech/how-to-install-node-version-manager-nvm-for-windows-10-4nbi) if you need more than node version
-- `npm install gulp --location=global` => install gulp globally
-- `npm install` => install node_modules
-- `gulp` => for development environment
-- `gulp prod` for final production folder
-- after you like, don't forget the star
+  - [download](https://nodejs.org/en/).
+  - or [use-nvm](https://dev.to/skaytech/how-to-install-node-version-manager-nvm-for-windows-10-4nbi) if you need more than node version.
+- `npm install gulp --location=global` => install gulp globally.
+- `npm install` => install node_modules.
+- `gulp` => for development environment.
+- `gulp prod` for final production folder.
+- after you like, don't forget the star.
 
 # step by step guide
 
