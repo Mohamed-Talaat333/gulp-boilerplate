@@ -19,7 +19,6 @@ import replace from "gulp-replace"; // replace certain text
 // import imageOpti from "gulp-image";
 import webp from "gulp-webp"; // convert images extensions to ".webp"
 import rename from "gulp-rename"; // for files renaming
-import cache from "gulp-cached"; // for caching files in stream
 // import concat from "gulp-concat"; // for files concating
 
 /*******************************************
@@ -58,9 +57,9 @@ var paths = {
   },
 
   // sass or css file paths
-  styles: {
+  customStyles: {
     src: "app/**/*.{scss,css}",
-    execlud: ["app/assets/styles/sass{,/**}", "app/assets/styles/vendors/**/*"],
+    execlud: ["app/**/_*", "app/assets/styles/sass{,/**}", "app/assets/styles/vendors/**/*"],
   },
 
   vendorStyles: {
@@ -221,20 +220,26 @@ function html() {
 
 /* handling style(sass) files
  *******************************************/
-function styles(passedPaths) {
-  // the initializer / master SCSS file, which will just be a file that imports everything
+function styles(parameterPaths) {
+  // the initializer / mastaer SCSS file, which will just be a file that imports everything
   return (
     src([
-      passedPaths.src,
-      ...passedPaths.execlud.map(function (item) {
+      parameterPaths.src,
+      ...parameterPaths.execlud.map(function (item) {
         return "!" + item;
       }),
     ])
-      // caching styles files
-      // .pipe(cache("styles"))
 
-      // prevent pipe breaking caused by errors from gulp plugins
-      .pipe(plumber())
+      // Detecting style file extenssion to write sourceMaps only if not css file (if sass file)
+      // .pipe(flatMap(function(stream, file){
+      //   var isExtenssionCss;
+      //   file.path.split(".").pop() == "css" ? isExtenssionCss = true : isExtenssionCss = false;
+
+      //   return stream
+
+      //   // Getting sourceMaps ready only if in development environment
+      //     .pipe(gulpIf(!isExtenssionCss && !isProd, sourceMaps.init()));
+      // }))
 
       // Getting sourceMaps ready only if in development environment
       .pipe(gulpIf(!isProd, sourceMaps.init()))
@@ -292,12 +297,12 @@ function styles(passedPaths) {
   );
 }
 
-function styles1(done) {
-  styles(paths.styles);
+function customStyles(done) {
+  styles(paths.customStyles);
   done();
 }
 
-function styles2(done) {
+function vendorStyles(done) {
   styles(paths.vendorStyles);
   done();
 }
@@ -354,8 +359,11 @@ function watch_files() {
   watch(paths.images.src, images);
   watch(paths.fonts.src, fonts);
   watch(paths.html.src, html);
-  watch(paths.styles.src, styles1);
-  watch(paths.vendorStyles.src, styles2);
+  watch(paths.customStyles.src, customStyles);
+  watch([paths.vendorStyles.src,
+    ...paths.vendorStyles.execlud.map(function (item) {
+      return "!" + item;
+    })], vendorStyles);
   watch(paths.scripts.src, scripts);
 
   // handling (deleted && renamed) files or folders while watching/running
@@ -388,8 +396,8 @@ task(
     images,
     fonts,
     html,
-    styles1,
-    styles2,
+    customStyles,
+    vendorStyles,
     scripts,
     watch_files
   )
@@ -403,7 +411,8 @@ task(
     images,
     fonts,
     html,
-    styles,
+    customStyles,
+    vendorStyles,
     scripts,
     function prodFinished(done) {
       console.log('Your final "prod" folder is ready');
