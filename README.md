@@ -39,6 +39,7 @@
   ┣ 📜READ-ME.txt
   ┣ 📜seo-agency-website-template.jpg
   ┗ 📜service.html
+  ```
 - auto name html page in the browser tab after the file naming
 
 ## CSS / SASS features
@@ -66,12 +67,12 @@
 - `gulp prod` for final production folder
 - after you like, don't forget the star
 
-
-
 # step by step guide
+
 - here we will be explaining each gulp task.
 
 ## setting output directory dev or prod env environments
+
 ```
 var outputDir = "dist"; // folder where all files and folders go after compiling
 var isProd = false; // setting production env to false
@@ -87,7 +88,9 @@ function setProdEnv(done) {
 ```
 
 ## setting source paths for gulp tasks
+
 - using file path wild card patterns and execlude array for certain files to be execluded from stream pipe.
+
 ```
 // path to files where you watch and start your task process
 var paths = {
@@ -104,13 +107,18 @@ var paths = {
   // html file paths
   html: {
     src: "app/**/*.html",
-    execlud: ["app/_html-partials{,/**}"],
+    execlud: ["app/html-partials{,/**}"],
   },
 
   // sass or css file paths
-  styles: {
+  customStyles: {
     src: "app/**/*.{scss,css}",
-    execlud: ["app/assets/styles/sass{,/**}"],
+    execlud: ["app/**/_*", "app/assets/styles/sass{,/**}", "app/assets/styles/vendors/**/*"],
+  },
+
+  vendorStyles: {
+    src: "app/**/*.{scss,css}",
+    execlud: ["app/assets/styles/sass{,/**}", "app/assets/styles/style{.css,.scss}"],
   },
 
   // js files paths
@@ -122,7 +130,9 @@ var paths = {
 ```
 
 ## remove old folders
+
 - remove old (dist && prod) directories then start over, **in case files got deleted or renamed while not watching**
+
 ```
 function removeOldFolders() {
   return remove(outputDir, { force: true });
@@ -130,6 +140,7 @@ function removeOldFolders() {
 ```
 
 ## init browser-sync
+
 - [browser-sync](https://www.npmjs.com/package/browser-sync) is responsible for live server providing **instant reload on any file change**, and generate access for external devices **(mobiles/tablets/other PCs)**.
 
 ```
@@ -158,6 +169,7 @@ function browser_sync() {
 ```
 
 ## handling images
+
 - this task is mainly for optimizing images and there are 2 ways to do this and you can choose either one you like =>
 
 1. first way is => optimize (png, jpg, jpeg, gif) images using [gulp-image](https://www.npmjs.com/package/gulp-image). this package do a great job optimizing images and reducing there size without affecting its quality.
@@ -190,7 +202,9 @@ function images() {
 ```
 
 ## handling HTML files
+
 - using [gulp-file-include](https://www.npmjs.com/package/gulp-file-include) we now can include html files into another html files passing arguments and using conditional if statements => see the (page-head, page-tail, and navbar active-link) file examples.
+
 ```
 .pipe(
   fileinclude({
@@ -199,17 +213,20 @@ function images() {
   })
 )
 ```
+
 - using [gulp-flatmap](https://www.npmjs.com/package/gulp-flatmap) we now can seperate each file from the src stream and do anything we want with it, and I mainly used it to do 2 things
-  1. using ```$$/``` sign before any rout, we can have base directory starting from ```app/```.
-      - for example in ```app/html-partials/page-head.html``` page in style links routs also the favicon.
-        ```
-        <link href="$$/assets/styles/style.css" rel="stylesheet" />
-        ```
-      
+
+  1. using `$$/` sign before any rout, we can have base directory starting from `app/`.
+
+     - for example in `app/html-partials/page-head.html` page in style links routs also the favicon.
+       ```
+       <link href="$$/assets/styles/style.css" rel="stylesheet" />
+       ```
 
   2. replace the title for each html file with the file name to view it on browser window tab.
 
-- in html-task we need to replace all of the image-extensions in the style file other than ```.svg && .ico``` to be webp and match the prechanged image-extensions in the images-task
+- in html-task we need to replace all of the image-extensions in the style file other than `.svg && .ico` to be webp and match the prechanged image-extensions in the images-task
+
 ```
 // replacing all images extensions to be '.webp'
   .pipe(gulpIf(isProd, replace('.jpg', '.webp')))
@@ -218,11 +235,11 @@ function images() {
   .pipe(gulpIf(isProd, replace('.gif', '.webp')))
 ```
 
-
 ## handling style files
+
 - other than compiling sass, wrting sourcemaps, css autoprefixing, and minifying => the best feature is purging-css.
 
-- using [gulp-purgecss](https://www.npmjs.com/package/gulp-purgecss) removes all unused css styles based on class-names used in html files as a reference. => see the difference between normal and minified bootstrap files-size after ```gulp-prod``` in prod-folder
+- using [gulp-purgecss](https://www.npmjs.com/package/gulp-purgecss) removes all unused css styles based on class-names used in html files as a reference. => see the difference between normal and minified bootstrap files-size after `gulp-prod` in prod-folder
 
   ```
   // removing unused css
@@ -236,11 +253,11 @@ function images() {
     )
   ```
 
-  - ```in some casses the html-code appended by an internal or external js plugin doesn't get counted for when style-purging and it removes it's styles.```
+  - `in some casses the html-code appended by an internal or external js plugin doesn't get counted for when style-purging and it removes it's styles.`
 
-  - ```in order for this purgecss package to work fine, you should copy the html-code that gets rendered in the browser and add it to an html page to get considered by gulp-purgecss, see (purge-css-components.html)=>(owl-carousel-component).```
+  - `in order for this purgecss package to work fine, you should copy the html-code that gets rendered in the browser and add it to an html page to get considered by gulp-purgecss, see (purge-css-components.html)=>(owl-carousel-component).`
 
-- then we minify css files and add suffix ```-min```
+- then we minify css files and add suffix `-min`
 
 ```
 // minifying our css file/s only if in production environment
@@ -250,7 +267,8 @@ function images() {
   .pipe(gulpIf(isProd, rename({ suffix: "-min" })))
 ```
 
-- after renaming minified css files adding ```-min``` suffix, we need to change the linking in html by adding an if statement ([gulp-file-include](https://www.npmjs.com/package/gulp-file-include)) to the link-href:
+- after renaming minified css files adding `-min` suffix, we need to change the linking in html by adding an if statement ([gulp-file-include](https://www.npmjs.com/package/gulp-file-include)) to the link-href:
+
 ```
 // we add this after the file name
 @@if(isProd){-min}
@@ -262,4 +280,3 @@ function images() {
 
 - searching fonts features
 - svg sprites
-
