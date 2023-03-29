@@ -324,6 +324,9 @@ function scripts() {
       // this is the filename of the compressed version of our js
       // .pipe(concat("app.js"))
 
+      // destination for the output if dev-env or in prod-env before minification
+      .pipe(dest(outputDir))
+
       // minifying our js file/s only if in production environment
       .pipe(
         gulpIf(
@@ -340,8 +343,8 @@ function scripts() {
         )
       )
 
-      // destination for the output
-      .pipe(dest(outputDir))
+      // destination for the output if prod-env after minification
+      .pipe(gulpIf(isProd, dest(outputDir)))
 
       // reloading broswer(browser-sync) after any chage only if in development environment
       .pipe(
