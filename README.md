@@ -280,3 +280,6 @@ function images() {
 
 - searching fonts features
 - svg sprites
+
+# License
+- The code is available under the [MIT License](https://github.com/Mohamed-Talaat333/gulp-boilerplate/blob/master/LICENSE.md).
