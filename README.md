@@ -59,6 +59,7 @@
 
 - first clone this repo or [download](https://github.com/Mohamed-Talaat333/gulp-boilerplate/archive/refs/heads/master.zip).
 - install Node.js 16.16.0 or higher =>
+  - check your node version if it is already installed `node -v`
   - [download](https://nodejs.org/en/).
   - or [use-nvm](https://dev.to/skaytech/how-to-install-node-version-manager-nvm-for-windows-10-4nbi) if you need more than node version.
 - `npm install gulp --location=global` => install gulp globally.
